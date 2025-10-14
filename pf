@@ -1,0 +1,86 @@
+import os
+fig = px.imshow(corr, text_auto=True, title='Mapa de Calor — Correlação (numéricas)')
+fig.update_layout(xaxis_title='Colunas', yaxis_title='Colunas')
+return fig
+
+
+if tab == 'bar':
+if bcat is None or bval is None:
+return go.Figure(layout_title_text='Selecione categoria e valor para o gráfico de barras.')
+d = df[[bcat, bval]].dropna()
+if bagg == 'sum':
+agg = d.groupby(bcat, as_index=False)[bval].sum()
+elif bagg == 'mean':
+agg = d.groupby(bcat, as_index=False)[bval].mean()
+elif bagg == 'median':
+agg = d.groupby(bcat, as_index=False)[bval].median()
+else:
+# count
+agg = d.groupby(bcat, as_index=False)[bval].count().rename(columns={bval: 'count'})
+bval = 'count'
+fig = px.bar(agg, x=bcat, y=bval, title=f'Barras — {bcat} por {bval} ({bagg})')
+fig.update_layout(xaxis_title=bcat, yaxis_title=bval)
+return fig
+
+
+if tab == 'pie':
+if pcat is None or pval is None:
+return go.Figure(layout_title_text='Selecione categoria e valor para o gráfico de pizza.')
+d = df[[pcat, pval]].dropna()
+agg = d.groupby(pcat, as_index=False)[pval].sum()
+fig = px.pie(agg, names=pcat, values=pval, title=f'Pizza — {pcat} por {pval} (soma)')
+return fig
+
+
+if tab == 'density':
+if dx is None:
+return go.Figure(layout_title_text='Selecione ao menos a coluna X para densidade.')
+if dy:
+fig = px.density_contour(df, x=dx, y=dy, title=f'Densidade 2D — {dx} vs {dy}', contours_coloring='fill')
+fig.update_traces(contours_showlabels=True)
+fig.update_layout(xaxis_title=dx, yaxis_title=dy)
+else:
+fig = px.density_contour(df, x=dx, title=f'Densidade 1D — {dx}', contours_coloring='fill')
+fig.update_layout(xaxis_title=dx, yaxis_title='Densidade')
+return fig
+
+
+if tab == 'reg':
+if rx is None or ry is None:
+return go.Figure(layout_title_text='Selecione X e Y para regressão.')
+# Regressão com trendline OLS requer statsmodels instalado
+try:
+fig = px.scatter(df, x=rx, y=ry, color=rcolor, trendline='ols', title=f'Regressão (OLS) — {rx} vs {ry}')
+except Exception:
+fig = px.scatter(df, x=rx, y=ry, color=rcolor, title=f'Regressão — {rx} vs {ry} (instale statsmodels p/ linha)')
+fig.update_layout(xaxis_title=rx, yaxis_title=ry)
+return fig
+
+
+return go.Figure()
+
+
+
+
+@app.callback(
+Output('table-preview', 'figure'),
+Input('tabs', 'value')
+)
+
+
+def update_table(_):
+if df.empty:
+return go.Figure()
+preview = df.head(12)
+fig = go.Figure(data=[go.Table(
+header=dict(values=list(preview.columns), align='left'),
+cells=dict(values=[preview[c] for c in preview.columns], align='left')
+)])
+fig.update_layout(title_text='Prévia dos dados (top 12 linhas)')
+return fig
+
+
+
+
+if __name__ == '__main__':
+app.run_server(debug=True)
