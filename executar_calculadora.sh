@@ -1,17 +1,16 @@
 #!/usr/bin/env bash
 # -----------------------------------------------------------
 # Script de execução do projeto "Calculadora Inteligente"
-# Autor: Natã Rodrigues
 # -----------------------------------------------------------
 
 echo "==============================================="
-echo " 🚀 Iniciando a Calculadora Inteligente em Python"
+echo " Iniciando a Calculadora Inteligente em Python"
 echo "==============================================="
 
 # Verifica se o Python 3 está instalado
 if ! command -v python3 &> /dev/null
 then
-    echo "❌ Python3 não encontrado. Instale o Python 3 para continuar."
+    echo " Python3 não encontrado. Instale o Python 3 para continuar."
     exit 1
 fi
 
@@ -111,5 +110,5 @@ python3 calculadora_inteligente_temp.py
 rm calculadora_inteligente_temp.py
 
 echo "==============================================="
-echo " 🧮 Execução finalizada com sucesso!"
+echo "Execução finalizada com sucesso!"
 echo "==============================================="
